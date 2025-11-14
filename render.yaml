@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: stock-portfolio-backend
+    plan: free
+    region: singapore   # or use 'frankfurt' if preferred
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: PORT
+        value: 8080

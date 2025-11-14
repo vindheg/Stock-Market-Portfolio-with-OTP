@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portfolio — Stock Portfolio</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --accent: #4e81ff;
+      --accent-glow: rgba(78, 129, 255, 0.55);
+      --glass-bg: rgba(20, 20, 25, 0.55);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text-light: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: #0d0d0f;
+      color: var(--text-light);
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3 {
+      font-family: "Poppins", sans-serif;
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+    }
+
+    .tab-active {
+      color: var(--accent) !important;
+      font-weight: 600;
+      text-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .card-hover:hover {
+      transform: translateY(-5px) scale(1.01);
+      box-shadow: 0 0 25px var(--accent-glow);
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen relative">
+
+  <canvas id="particles"></canvas>
+
+  <!-- NAVBAR -->
+  <nav class="relative z-20 glass py-4 px-6 flex items-center justify-between shadow-lg">
+    <div class="flex items-center gap-3">
+      <div class="text-2xl">📈</div>
+      <h1 class="text-xl font-semibold">Stock Portfolio</h1>
+    </div>
+    <div class="flex items-center gap-4">
+      <div id="username-display" class="text-sm text-gray-300"></div>
+      <button id="logout-btn" class="bg-red-500 hover:bg-red-600 px-3 py-2 rounded-md text-sm text-white">
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <!-- TABS -->
+  <div class="relative z-20 mt-5 mx-4 glass rounded-xl p-3 flex items-center justify-center gap-8 shadow-lg">
+    <button class="tab-btn text-gray-300 font-medium" data-tab="portfolio">Portfolio</button>
+    <button class="tab-btn text-gray-300 font-medium" data-tab="trade">Buy / Sell</button>
+    <button class="tab-btn text-gray-300 font-medium" data-tab="market">Market Stats</button>
+  </div>
+
+  <main class="relative z-20 px-4 md:px-10 py-8">
+
+    <!-- PORTFOLIO -->
+    <section id="portfolio" class="tab-content">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <div>
+          <h2 class="text-3xl font-semibold">💼 My Portfolio</h2>
+          <p class="text-sm text-gray-400">Your current holdings</p>
+        </div>
+
+        <div class="glass rounded-xl p-4 flex items-center gap-6">
+          <div class="text-gray-400 text-sm">Balance</div>
+          <div id="balance-display" class="text-xl font-bold text-[var(--accent)]">₹100000.00</div>
+        </div>
+      </div>
+
+      <div id="portfolio-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"></div>
+
+      <div id="empty-state" class="hidden glass rounded-xl p-8 text-center text-gray-400">
+        No holdings yet. Buy stocks from the Trade tab.
+      </div>
+    </section>
+
+    <!-- TRADE -->
+    <section id="trade" class="tab-content hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- BUY -->
+        <div class="glass rounded-xl p-6">
+          <h3 class="text-lg font-semibold mb-4">Buy Stock</h3>
+
+          <label class="block text-sm text-gray-400 mb-1">Select Stock</label>
+          <select id="buy-stock"
+                  class="w-full p-3 rounded-md bg-black/30 border border-gray-700 text-gray-200 mb-3">
+            <option value="">-- Select Stock --</option>
+            <option>Jio Financial Services</option>
+            <option>Bharat Electronics</option>
+            <option>Nestle India</option>
+            <option>Tata Motors</option>
+            <option>Axis</option>
+            <option>Britania</option>
+            <option>ICICI</option>
+            <option>HCL Tech</option>
+          </select>
+
+          <label class="block text-sm text-gray-400 mb-1">Quantity</label>
+          <input id="buy-qty" type="number"
+                class="w-full p-3 rounded-md bg-black/30 border border-gray-700 text-gray-200 mb-4" />
+
+          <button id="buy-btn"
+                  class="w-full py-3 rounded-md bg-[var(--accent)] hover:bg-blue-600 text-white">
+            Buy
+          </button>
+        </div>
+
+        <!-- SELL -->
+        <div class="glass rounded-xl p-6">
+          <h3 class="text-lg font-semibold mb-4">Sell Stock</h3>
+
+          <label class="block text-sm text-gray-400 mb-1">Select Stock</label>
+          <select id="sell-stock"
+                  class="w-full p-3 rounded-md bg-black/30 border border-gray-700 text-gray-200 mb-3">
+            <option value="">-- Select Stock --</option>
+            <option>Jio Financial Services</option>
+            <option>Bharat Electronics</option>
+            <option>Nestle India</option>
+            <option>Tata Motors</option>
+            <option>Axis</option>
+            <option>Britania</option>
+            <option>ICICI</option>
+            <option>HCL Tech</option>
+          </select>
+
+          <label class="block text-sm text-gray-400 mb-1">Quantity</label>
+          <input id="sell-qty" type="number"
+                class="w-full p-3 rounded-md bg-black/30 border border-gray-700 text-gray-200 mb-4" />
+
+          <button id="sell-btn"
+                  class="w-full py-3 rounded-md bg-red-600 hover:bg-red-700 text-white">
+            Sell
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MARKET -->
+    <section id="market" class="tab-content hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="glass rounded-xl p-5">
+          <h3 class="font-semibold mb-3">NSE Stocks</h3>
+          <ul id="nse-list" class="space-y-2 text-gray-300"></ul>
+        </div>
+
+        <div class="glass rounded-xl p-5">
+          <h3 class="font-semibold mb-3">BSE Stocks</h3>
+          <ul id="bse-list" class="space-y-2 text-gray-300"></ul>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- POPUP -->
+  <div id="popup"
+     class="fixed top-6 right-6 px-5 py-3 rounded-xl text-white font-medium shadow-lg opacity-0 pointer-events-none transition-all duration-500 z-[9999]"
+     style="background:rgba(30,30,40,0.85); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.08); transform:translateY(-20px);">
+  </div>
+
+
+  <!-- JS LOGIC -->
+  <script>
+    const BACKEND_HOST = "https://stock-market-portfolio-1-i85m.onrender.com";
+    const username = sessionStorage.getItem("username");
+    if (!username) location.href = "login.html";
+
+    document.getElementById("username-display").innerText = `Welcome, ${username}`;
+
+    const NSE = {
+      "Jio Financial Services": 283.55,
+      "Bharat Electronics": 384.80,
+      "Nestle India": 2398.00,
+      "Tata Motors": 709.60
+    };
+
+    const BSE = {
+      "Axis": 1175.60,
+      "Britania": 5549.50,
+      "ICICI": 1429.00,
+      "HCL Tech": 1641.50
+    };
+
+    let userState = { balance: 100000, holdings: {} };
+
+
+    /* POPUP FUNCTION */
+    function showPopup(message, type = "success") {
+      const el = document.getElementById("popup");
+      el.innerText = message;
+
+      if (type === "success") {
+        el.style.border = "1px solid rgba(78,129,255,0.6)";
+        el.style.boxShadow = "0 0 18px rgba(78,129,255,0.5)";
+      } else {
+        el.style.border = "1px solid rgba(255,77,77,0.6)";
+        el.style.boxShadow = "0 0 18px rgba(255,77,77,0.45)";
+      }
+
+      el.classList.remove("opacity-0");
+      el.classList.add("opacity-100");
+      el.style.transform = "translateY(0)";
+
+      setTimeout(() => {
+        el.classList.add("opacity-0");
+        el.classList.remove("opacity-100");
+        el.style.transform = "translateY(-20px)";
+      }, 2000);
+    }
+
+
+    /* FIXED loadUser() */
+    async function loadUser() {
+      try {
+        const res = await fetch(`${BACKEND_HOST}/api/stocks/portfolio/${username}`);
+        userState = await res.json();
+
+        // Ensure balance always exists
+        if (userState.balance === undefined || userState.balance === null) {
+          userState.balance = 100000;
+        }
+
+      } catch {
+        userState = { holdings: {}, balance: 100000 };
+      }
+
+      renderPortfolio();
+      renderMarketLists();
+    }
+
+
+    function renderPortfolio() {
+      const container = document.getElementById("portfolio-cards");
+      container.innerHTML = "";
+      const empty = document.getElementById("empty-state");
+
+      const stocks = Object.keys(userState.holdings || {});
+      if (stocks.length === 0) {
+        empty.classList.remove("hidden");
+      } else {
+        empty.classList.add("hidden");
+      }
+
+      stocks.forEach(stock => {
+        const qty = userState.holdings[stock];
+        const price = NSE[stock] || BSE[stock] || 0;
+        const value = qty * price;
+
+        const card = document.createElement("div");
+        card.className = "glass p-5 rounded-xl card-hover shadow-lg transition";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold">${stock}</h3>
+              <p class="text-gray-400 text-sm">Qty: ${qty}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-gray-400 text-sm">Price</p>
+              <p class="text-[var(--accent)] font-semibold">₹${price.toFixed(2)}</p>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <p class="text-gray-400 text-sm">Total Value</p>
+            <p class="text-xl font-bold text-[var(--accent)]">₹${value.toFixed(2)}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      const balance = userState.balance ?? 100000;
+      document.getElementById("balance-display").innerText = "₹" + balance.toFixed(2);
+    }
+
+
+    /* BUY */
+    document.getElementById("buy-btn").onclick = async () => {
+      const stock = document.getElementById("buy-stock").value;
+      const qty = parseInt(document.getElementById("buy-qty").value);
+
+      if (!stock || qty <= 0) return showPopup("Invalid stock/quantity", "error");
+
+      const res = await fetch(`${BACKEND_HOST}/api/stocks/buy/${username}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stock, quantity: qty }),
+      });
+
+      if (res.ok) {
+        userState = await res.json();
+        renderPortfolio();
+        showPopup(`Bought ${qty} shares of ${stock}`, "success");
+      } else {
+        showPopup(await res.text(), "error");
+      }
+    };
+
+
+    /* SELL */
+    document.getElementById("sell-btn").onclick = async () => {
+      const stock = document.getElementById("sell-stock").value;
+      const qty = parseInt(document.getElementById("sell-qty").value);
+
+      if (!stock || qty <= 0) return showPopup("Invalid stock/quantity", "error");
+
+      const res = await fetch(`${BACKEND_HOST}/api/stocks/sell/${username}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stock, quantity: qty }),
+      });
+
+      if (res.ok) {
+        userState = await res.json();
+        renderPortfolio();
+        showPopup(`Sold ${qty} shares of ${stock}`, "success");
+      } else {
+        showPopup(await res.text(), "error");
+      }
+    };
+
+
+    /* MARKET LISTS */
+    function renderMarketLists() {
+      const nseList = document.getElementById("nse-list");
+      const bseList = document.getElementById("bse-list");
+
+      nseList.innerHTML = "";
+      bseList.innerHTML = "";
+
+      Object.entries(NSE).forEach(([name, price]) => {
+        nseList.innerHTML += `<li>${name}: ₹${price}</li>`;
+      });
+
+      Object.entries(BSE).forEach(([name, price]) => {
+        bseList.innerHTML += `<li>${name}: ₹${price}</li>`;
+      });
+    }
+
+
+    /* LOGOUT */
+    document.getElementById("logout-btn").onclick = () => {
+      sessionStorage.clear();
+      location.href = "login.html";
+    };
+
+
+    /* TABS */
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll(".tab-content").forEach(t => t.classList.add("hidden"));
+        document.getElementById(btn.dataset.tab).classList.remove("hidden");
+
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("tab-active"));
+        btn.classList.add("tab-active");
+      };
+    });
+
+    document.querySelector('[data-tab="portfolio"]').click();
+    loadUser();
+
+
+    /* PARTICLES */
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+
+    function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+    addEventListener("resize", resize);
+    resize();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.r = Math.random() * 2 + 1;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.c = "rgba(78,129,255,0.15)";
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = this.c;
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      for (let i = 0; i < 80; i++) particles.push(new Particle());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animate);
+    }
+
+    initParticles();
+    animate();
+  </script>
+
+</body>
+</html>

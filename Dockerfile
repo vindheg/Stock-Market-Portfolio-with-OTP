@@ -8,13 +8,13 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
-# Make mvnw executable (Fixes: Permission denied)
+# Make mvnw executable
 RUN chmod +x mvnw
 
-# Download dependencies (cache layer)
-RUN ./mvnw dependency:go-offline -B
+# ❌ REMOVE go-offline because Brevo SDK is not in Maven Central
+# RUN ./mvnw dependency:go-offline -B   <-- DELETE THIS
 
-# Copy source code
+# Copy source code AFTER dependencies
 COPY src ./src
 
 # Build the JAR (skip tests)

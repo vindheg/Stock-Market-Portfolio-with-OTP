@@ -192,7 +192,6 @@
      style="background:rgba(30,30,40,0.85); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.08); transform:translateY(-20px);">
   </div>
 
-
   <!-- JS LOGIC -->
   <script>
     const BACKEND_HOST = "https://stock-market-portfolio-1-i85m.onrender.com";
@@ -216,7 +215,6 @@
     };
 
     let userState = { balance: 100000, holdings: {} };
-
 
     /* POPUP FUNCTION */
     function showPopup(message, type = "success") {
@@ -242,14 +240,12 @@
       }, 2000);
     }
 
-
     /* FIXED loadUser() */
     async function loadUser() {
       try {
-        const res = await fetch(`/api/stocks/portfolio/${username}`);
+        const res = await fetch(`${BACKEND_HOST}/api/stocks/portfolio/${username}`);
         userState = await res.json();
 
-        // Ensure balance always exists
         if (userState.balance === undefined || userState.balance === null) {
           userState.balance = 100000;
         }
@@ -262,18 +258,14 @@
       renderMarketLists();
     }
 
-
     function renderPortfolio() {
       const container = document.getElementById("portfolio-cards");
       container.innerHTML = "";
       const empty = document.getElementById("empty-state");
 
       const stocks = Object.keys(userState.holdings || {});
-      if (stocks.length === 0) {
-        empty.classList.remove("hidden");
-      } else {
-        empty.classList.add("hidden");
-      }
+      if (stocks.length === 0) empty.classList.remove("hidden");
+      else empty.classList.add("hidden");
 
       stocks.forEach(stock => {
         const qty = userState.holdings[stock];
@@ -306,15 +298,15 @@
       document.getElementById("balance-display").innerText = "₹" + balance.toFixed(2);
     }
 
-
     /* BUY */
     document.getElementById("buy-btn").onclick = async () => {
       const stock = document.getElementById("buy-stock").value;
       const qty = parseInt(document.getElementById("buy-qty").value);
 
-      if (!stock || qty <= 0) return showPopup("Invalid stock/quantity", "error");
+      if (!stock || qty <= 0)
+        return showPopup("Invalid stock/quantity", "error");
 
-      const res = await fetch(`/api/stocks/buy/${username}`, {
+      const res = await fetch(`${BACKEND_HOST}/api/stocks/buy/${username}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stock, quantity: qty }),
@@ -329,15 +321,15 @@
       }
     };
 
-
     /* SELL */
     document.getElementById("sell-btn").onclick = async () => {
       const stock = document.getElementById("sell-stock").value;
       const qty = parseInt(document.getElementById("sell-qty").value);
 
-      if (!stock || qty <= 0) return showPopup("Invalid stock/quantity", "error");
+      if (!stock || qty <= 0)
+        return showPopup("Invalid stock/quantity", "error");
 
-      const res = await fetch(`/api/stocks/sell/${username}`, {
+      const res = await fetch(`${BACKEND_HOST}/api/stocks/sell/${username}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stock, quantity: qty }),
@@ -351,7 +343,6 @@
         showPopup(await res.text(), "error");
       }
     };
-
 
     /* MARKET LISTS */
     function renderMarketLists() {
@@ -370,13 +361,11 @@
       });
     }
 
-
     /* LOGOUT */
     document.getElementById("logout-btn").onclick = () => {
       sessionStorage.clear();
       location.href = "login.html";
     };
-
 
     /* TABS */
     document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -391,7 +380,6 @@
 
     document.querySelector('[data-tab="portfolio"]').click();
     loadUser();
-
 
     /* PARTICLES */
     const canvas = document.getElementById("particles");

@@ -18,39 +18,30 @@
 
     h2 { font-family: 'Poppins', sans-serif; }
 
-    /* DARK GLASS CARD */
     .glass-card {
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 0 25px rgba(0,0,0,0.45);
     }
 
-    /* Inputs */
     .input-box {
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.12);
       color: #e7e7e9;
     }
+    .input-box::placeholder { color: #a1a1a8; }
 
-    .input-box::placeholder {
-      color: #a1a1a8;
-    }
-
-    /* Blue Glow Button */
     .primary-btn {
       background: #4040ff;
       color: white;
       transition: 0.2s;
     }
-
     .primary-btn:hover {
       background: #2a2aff;
       box-shadow: 0 0 20px rgba(64,64,255,0.4);
     }
 
-    /* Particle Canvas */
     canvas {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 0;
@@ -60,59 +51,96 @@
 
 <body class="min-h-screen flex items-center justify-center relative">
 
-  <!-- Particle Background -->
-  <canvas id="particles"></canvas>
+<canvas id="particles"></canvas>
 
-  <!-- Login Card -->
-  <div class="glass-card relative z-10 w-full max-w-md p-10 rounded-2xl">
+<div class="glass-card relative z-10 w-full max-w-md p-10 rounded-2xl">
+  <h2 class="text-3xl text-center text-white font-semibold mb-8 tracking-wide">
+    Welcome Back
+  </h2>
 
-    <h2 class="text-3xl text-center text-white font-semibold mb-8 tracking-wide">
-      Welcome Back
-    </h2>
+  <!-- LOGIN + OTP FORM -->
+  <form id="login-form" class="space-y-6">
 
-    <form id="login-form" class="space-y-6">
+    <!-- LOGIN FIELDS -->
+    <div id="login-fields">
 
       <div>
         <label class="block text-sm font-semibold text-gray-300 mb-2">Username</label>
-        <input 
-          type="text" 
-          id="username"
-          class="input-box w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          placeholder="Enter username"
-          required
+        <input
+                type="text"
+                id="username"
+                class="input-box w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="Enter username"
+                required
         />
       </div>
 
       <div>
         <label class="block text-sm font-semibold text-gray-300 mb-2">Password</label>
-        <input 
-          type="password" 
-          id="password"
-          class="input-box w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          placeholder="Enter password"
-          required
+        <input
+                type="password"
+                id="password"
+                class="input-box w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="Enter password"
+                required
         />
       </div>
 
-      <button 
-        type="submit"
-        class="primary-btn w-full py-3 rounded-lg font-semibold shadow-md"
+      <button
+              type="submit"
+              class="primary-btn w-full py-3 rounded-lg font-semibold shadow-md"
       >
         Login
       </button>
 
-    </form>
+    </div>
+    <!-- END LOGIN FIELDS -->
 
-    <p class="text-center text-xs text-gray-400 mt-4 italic">
-      Any username/password works
-    </p>
-  </div>
+    <!-- OTP FIELDS (HIDDEN INITIALLY) -->
+    <div id="otp-section" style="display:none;">
 
-  <!-- Login Logic (UNCHANGED) -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-300 mb-2">Enter OTP</label>
+        <input
+                type="text"
+                id="otp"
+                class="input-box w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="Enter OTP"
+        />
+      </div>
+
+      <button
+              type="button"
+              id="verify-otp-btn"
+              class="primary-btn w-full py-3 rounded-lg font-semibold shadow-md mt-4"
+      >
+        Verify OTP
+      </button>
+
+    </div>
+    <!-- END OTP SECTION -->
+
+  </form>
+
+  <p class="text-center text-xs text-gray-400 mt-4 italic">
+    Any username/password works
+  </p>
+</div>
+
+<!-- ================================ -->
+<!--       LOGIN + OTP SCRIPT        -->
+<!-- ================================ -->
+
 <script>
-  const form = document.getElementById("login-form");
+  const loginFields = document.getElementById("login-fields");
+  const otpSection = document.getElementById("otp-section");
+
   const usernameInput = document.getElementById("username");
   const passwordInput = document.getElementById("password");
+  const otpInput = document.getElementById("otp");
+  const verifyOtpBtn = document.getElementById("verify-otp-btn");
+
+  const form = document.getElementById("login-form");
 
   function showError(input, message) {
     let errorBox = input.parentElement.querySelector(".error-msg");
@@ -133,34 +161,66 @@
     input.classList.remove("border-red-500", "focus:ring-red-500");
   }
 
-  form.addEventListener("submit", function (e) {
+  // STEP 1 → send login & OTP request
+  form.addEventListener("submit", function(e) {
     e.preventDefault();
 
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
-    let valid = true;
-
     clearError(usernameInput);
     clearError(passwordInput);
 
-    // Username validation
-    if (username.length < 3) {
-      showError(usernameInput, "Username must be at least 3 characters.");
-      valid = false;
+    if (username.length < 3) return showError(usernameInput, "Username too short.");
+    if (password.length < 4) return showError(passwordInput, "Password too short.");
+
+    fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "otp_sent") {
+        sessionStorage.setItem("username", username);
+        alert("OTP sent to your email.");
+
+        // Hide login, show OTP
+        loginFields.style.display = "none";
+        otpSection.style.display = "block";
+
+      } else {
+        alert(data.message || "Login failed");
+      }
+    });
+  });
+
+  // STEP 2 → verify OTP
+  verifyOtpBtn.addEventListener("click", function () {
+    const username = sessionStorage.getItem("username");
+    const otp = otpInput.value.trim();
+
+    if (otp.length < 4) {
+      showError(otpInput, "Invalid OTP");
+      return;
     }
 
-    // Password validation
-    if (password.length < 4) {
-      showError(passwordInput, "Password must be at least 4 characters.");
-      valid = false;
-    }
+    fetch("/api/auth/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, otp })
+    })
+    .then(res => res.json())
+    .then(data => {
 
-    if (!valid) return;
+      if (data.status === "success") {
+        window.location.href = "portfolio.html";
+      }
+      else {
+        showError(otpInput, "Incorrect OTP");
+      }
 
-    // Success → Store user
-    sessionStorage.setItem("username", username);
-    window.location.href = "portfolio.html";
+    });
   });
 </script>
 
@@ -174,57 +234,58 @@
   }
 </style>
 
-  <!-- Particle Background JS (UNCHANGED LOGIC) -->
-  <script>
-    const canvas = document.getElementById("particles");
-    const ctx = canvas.getContext("2d");
-    let particlesArray;
-    const numParticles = 60;
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+<!-- Particle BG JS: UNCHANGED -->
+<script>
+  const canvas = document.getElementById("particles");
+  const ctx = canvas.getContext("2d");
+  let particlesArray;
+  const numParticles = 60;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 3 + 1;
+      this.speedX = (Math.random() - 0.5) * 0.4;
+      this.speedY = (Math.random() - 0.5) * 0.4;
+      this.color = `rgba(64,64,255,${Math.random() * 0.4 + 0.2})`;
     }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 3 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.4;
-        this.speedY = (Math.random() - 0.5) * 0.4;
-        this.color = `rgba(64,64,255,${Math.random() * 0.4 + 0.2})`; /* blue tint */
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-      }
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-      }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+      if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
     }
-
-    function initParticles() {
-      particlesArray = [];
-      for (let i = 0; i < numParticles; i++) particlesArray.push(new Particle());
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
     }
+  }
 
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particlesArray.forEach(p => { p.update(); p.draw(); });
-      requestAnimationFrame(animateParticles);
-    }
+  function initParticles() {
+    particlesArray = [];
+    for (let i = 0; i < numParticles; i++) particlesArray.push(new Particle());
+  }
 
-    initParticles();
-    animateParticles();
-  </script>
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particlesArray.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animateParticles);
+  }
+
+  initParticles();
+  animateParticles();
+</script>
 
 </body>
 </html>

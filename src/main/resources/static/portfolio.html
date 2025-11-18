@@ -246,7 +246,7 @@
     /* FIXED loadUser() */
     async function loadUser() {
       try {
-        const res = await fetch(`${BACKEND_HOST}/api/stocks/portfolio/${username}`);
+        const res = await fetch(`/api/stocks/portfolio/${username}`);
         userState = await res.json();
 
         // Ensure balance always exists
@@ -314,7 +314,7 @@
 
       if (!stock || qty <= 0) return showPopup("Invalid stock/quantity", "error");
 
-      const res = await fetch(`${BACKEND_HOST}/api/stocks/buy/${username}`, {
+      const res = await fetch(`/api/stocks/buy/${username}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stock, quantity: qty }),
@@ -337,7 +337,7 @@
 
       if (!stock || qty <= 0) return showPopup("Invalid stock/quantity", "error");
 
-      const res = await fetch(`${BACKEND_HOST}/api/stocks/sell/${username}`, {
+      const res = await fetch(`/api/stocks/sell/${username}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stock, quantity: qty }),

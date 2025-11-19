@@ -23,28 +23,29 @@ public class PortfolioService {
     private HoldingRepository holdRepo;
 
     // Stock price map
-    private Map<String, Double> stockPrices = Map.of(
-           "MRF Ltd" , 153500.00,
-      "Jio Financial Services", 304.65,
-      "Bharat Electronics", 423.25,
-      "Nestle India", 1279.90,
-      "Tata Motors", 361.00,
-      "Bharati Airtel LTD", 2160.00,
-      "Reliance Industries Ltd", 1519.00,
-      "Piramal Finance Ltd", 1609.00,
-      "Sun Pharmaceutical Industries Ltd", 1786.50,
-      "Titan Company Ltd", 3934.80,
-       "JSW Steel Ltd", 1169.05,
-      "Axis Bank Ltd", 1270.05,
-      "Britania", 5875.95,
-      "ICICI", 1383.10,
-      "HCL Tech", 1663.70,
-      "Infosys Ltd", 1541.25,
-      "Larsen and Toubro Ltd", 4019.30,
-      "Asian Paints Ltd", 2886.35,
-      "UltraTech Cement Ltd", 11678.00,
-      "Hindustan Aeronautics Ltd", 4744.25
-    );
+    private Map<String, Double> stockPrices = Map.ofEntries(
+    Map.entry("MRF Ltd", 153500.00),
+    Map.entry("Jio Financial Services", 304.65),
+    Map.entry("Bharat Electronics", 423.25),
+    Map.entry("Nestle India", 1279.90),
+    Map.entry("Tata Motors", 361.00),
+    Map.entry("Bharati Airtel LTD", 2160.00),
+    Map.entry("Reliance Industries Ltd", 1519.00),
+    Map.entry("Piramal Finance Ltd", 1609.00),
+    Map.entry("Sun Pharmaceutical Industries Ltd", 1786.50),
+    Map.entry("Titan Company Ltd", 3934.80),
+    Map.entry("JSW Steel Ltd", 1169.05),
+    Map.entry("Axis Bank Ltd", 1270.05),
+    Map.entry("Britania", 5875.95),
+    Map.entry("ICICI", 1383.10),
+    Map.entry("HCL Tech", 1663.70),
+    Map.entry("Infosys Ltd", 1541.25),
+    Map.entry("Larsen and Toubro Ltd", 4019.30),
+    Map.entry("Asian Paints Ltd", 2886.35),
+    Map.entry("UltraTech Cement Ltd", 11678.00),
+    Map.entry("Hindustan Aeronautics Ltd", 4744.25)
+);
+
 
     // ---------------------------
     // GET PORTFOLIO

@@ -24,14 +24,26 @@ public class PortfolioService {
 
     // Stock price map
     private Map<String, Double> stockPrices = Map.of(
-            "Tata Motors", 709.60,
-            "Axis", 1175.60,
-            "Britania", 5549.50,
-            "ICICI", 1429.00,
-            "HCL Tech", 1641.50,
-            "Jio Financial Services", 283.55,
-            "Bharat Electronics", 384.80,
-            "Nestle India", 2398.0
+           "MRF Ltd" , 153500.00,
+      "Jio Financial Services", 304.65,
+      "Bharat Electronics", 423.25,
+      "Nestle India", 1279.90,
+      "Tata Motors", 361.00,
+      "Bharati Airtel LTD", 2160.00,
+      "Reliance Industries Ltd", 1519.00,
+      "Piramal Finance Ltd", 1609.00,
+      "Sun Pharmaceutical Industries Ltd", 1786.50
+      "Titan Company Ltd", 3934.80,
+       "JSW Steel Ltd", 1169.05,
+      "Axis Bank Ltd", 1270.05,
+      "Britania", 5875.95,
+      "ICICI", 1383.10,
+      "HCL Tech", 1663.70,
+      "Infosys Ltd", 1541.25,
+      "Larsen and Toubro Ltd", 4019.30,
+      "Asian Paints Ltd", 2886.35,
+      "UltraTech Cement Ltd", 11678.00,
+      "Hindustan Aeronautics Ltd", 4744.25
     );
 
     // ---------------------------

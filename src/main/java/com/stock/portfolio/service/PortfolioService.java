@@ -32,7 +32,7 @@ public class PortfolioService {
       "Bharati Airtel LTD", 2160.00,
       "Reliance Industries Ltd", 1519.00,
       "Piramal Finance Ltd", 1609.00,
-      "Sun Pharmaceutical Industries Ltd", 1786.50
+      "Sun Pharmaceutical Industries Ltd", 1786.50,
       "Titan Company Ltd", 3934.80,
        "JSW Steel Ltd", 1169.05,
       "Axis Bank Ltd", 1270.05,

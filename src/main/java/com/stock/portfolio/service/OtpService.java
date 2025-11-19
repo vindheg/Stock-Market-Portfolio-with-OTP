@@ -14,6 +14,7 @@ public class OtpService {
     public String generateOtp(String username) {
         String otp = String.format("%06d", new Random().nextInt(999999));
         otpStore.put(username, otp);
+        System.out.println("Otp for user: "+username+"="+otp);
         return otp;
     }
 
